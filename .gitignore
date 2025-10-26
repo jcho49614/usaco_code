@@ -3,3 +3,72 @@
 build/
 bin/
 dist/
+
+
+# =========================================
+# 🌟 macOS + C++ + VS Code .gitignore
+# =========================================
+
+# ---- macOS system files ----
+.DS_Store
+.AppleDouble
+.LSOverride
+.Trashes
+._*
+.Spotlight-V100
+.fseventsd
+
+# ---- Build artifacts ----
+*.o
+*.obj
+*.so
+*.a
+*.out
+*.exe
+*.dll
+
+# ---- C++ compiled binaries ----
+# Executables with no extension (macOS/Unix style)
+a.out
+main
+*.bin
+
+# ---- Clang / LLDB / Xcode debug symbols ----
+# These folders appear after building with debug info (-g)
+*.dSYM/
+*.dSYM/**
+
+# ---- Logs and temp files ----
+*.log
+*.tmp
+*.swp
+*.swo
+
+# ---- VS Code settings (optional) ----
+.vscode/
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# ---- Build output folders ----
+build/
+bin/
+dist/
+
+# ---- Backups ----
+*~
+*.bak
+*.old
+
+# ---- IDE / Editor junk ----
+Thumbs.db
+ehthumbs.db
+Icon?
+.idea/
+*.iml
+
+# =========================================
+# End of .gitignore
+# =========================================
