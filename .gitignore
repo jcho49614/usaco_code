@@ -1,0 +1,5 @@
+﻿*.exe
+.vscode/
+build/
+bin/
+dist/
