@@ -1,5 +1,7 @@
 #include <bits/stdc++.h>
 
+//uses sparsetable
+
 using namespace std;
 
 int N, M, K, prv, cur = 1;

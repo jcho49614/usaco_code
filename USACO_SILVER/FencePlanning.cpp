@@ -2,6 +2,8 @@
 #include <vector>
 using namespace std;
 
+//uses DFS
+
 int n, m;
 /*normal input v[number] pair(x,y)*/ vector<int> v1[100005];
 /*linked list?*/ vector<int> v2[100005];
