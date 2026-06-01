@@ -20,13 +20,19 @@ void merge(int a, int b) {
 }
 
 int main() {
+  // Fast I/O
   ios_base::sync_with_stdio(false);
   cin.tie(NULL);
-  int N, M,A,B;
+
+  // USACO File I/O redirection
+  freopen("fenceplan.in", "r", stdin);
+  freopen("fenceplan.out", "w", stdout);
+
+  int N, M, A, B;
   int ans = 1e9;
   cin >> N >> M;
   for(int i=0; i<N; i++) {
-    int x,y;
+    int x, y;
     cin >> x >> y;
     num[3][i] = num[1][i] = x;
     num[4][i] = num[2][i] = y;
@@ -41,7 +47,7 @@ int main() {
     merge(A, B);
   }
 
-  for(int i=0;i<N;i++) {
+  for(int i=0; i<N; i++) {
     if(num[0][i] < 0){
       ans = min(ans, 2*(num[4][i]-num[2][i])+2*(num[3][i]-num[1][i]));
     }
