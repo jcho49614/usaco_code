@@ -1,74 +1,98 @@
-#include <iostream>
-#include <vector>
-#include <utility>
+#include <bits/stdc++.h>
 using namespace std;
 
-int grassypatches[1000000005];		//this is for the flavor
-int identifier[1000000005];			//1 is for grassy patch, 2 is for Nhoj's cows
-int ncl[200005];
-vector<pair<int, long long>> potentialjc;	//first integer is amount of cows, second integer is how much FLAVOR
+int K, M, N;
 
-//only the tastiness total sum should be long long
+struct Grass {
+    long long p, t; // 위치(position), 맛(tastiness)
+};
+Grass grass[200005];
+long long nhoj[200005];
 
-int main(){
-	int k, m, n;
-	cin >> k >> m >> n;
-	
-	for(int i =0 ; i < k; i++){
-		int tmp1, tmp2;
-		cin >> tmp1 >> tmp2;
-		grassypatches[tmp1] = tmp2;
-		identifier[tmp1] = 1;
-	}
+// 잔디를 위치 순으로 오름차순 정렬
+bool cmpGrass(Grass a, Grass b) {
+    return a.p < b.p;
+}
 
-	for(int i = 0; i < m; i++){
-		int tmp1; cin >> tmp1;
-		identifier[tmp1] = 2;
-		ncl[i] = tmp1;
-	}
+int main() {
+    cin.tie(0);
+    ios_base::sync_with_stdio(0);
 
-	//STAGE 1: BEFORE NHOJ
+    cin >> K >> M >> N;
+    for (int i = 0; i < K; i++) {
+        cin >> grass[i].p >> grass[i].t;
+    }
+    for (int i = 0; i < M; i++) {
+        cin >> nhoj[i];
+    }
 
-	int count = 0;
-	long long flavourcount = 0;
-	while(true){
-		if(identifier[count] == 2) break;
-		else if(identifier[count] == 0) {count++; continue;}
-		else {flavourcount += grassypatches[count]; count++;}
-	}
-	potentialjc.push_back(make_pair(1, flavourcount));
+    sort(grass, grass + K, cmpGrass);
+    sort(nhoj, nhoj + M);
 
-	//STAGE 2: DURING NHOJ.
-	/*
-	Two stages: Inbetween every NHOJ you can either get all
-	values with 1 cow or 2 cows.
+    vector<long long> values; // 소 1마리를 투자할 때마다 얻을 수 있는 이득들
+    int g_idx = 0;
 
-	Use the Sliding Window principle.
+    // 1. 노지의 첫 번째 소보다 '왼쪽' 구역 (1마리로 전체 독식)
+    long long left_sum = 0;
+    while (g_idx < K && grass[g_idx].p < nhoj[0]) {
+        left_sum += grass[g_idx].t;
+        g_idx++;
+    }
+    values.push_back(left_sum);
 
-	*/
+    // 2. 노지의 소들 '사이' 구역 (투 포인터 슬라이딩 윈도우)
+    for (int i = 0; i < M - 1; i++) {
+        long long A = nhoj[i];
+        long long B = nhoj[i + 1];
 
-	int sn = 0;
-	int en = 1;		//these are the indexes for nhoj cows.
+        long long total_sum = 0;
+        int start_idx = g_idx;
+        while (g_idx < K && grass[g_idx].p < B) {
+            total_sum += grass[g_idx].t;
+            g_idx++;
+        }
 
-	while(en < m){
-		//i need to subtract ALL VALUES by nhoj[startingnhoj] so that I can find the middle easier.
-		int firstcow = 0;
-		int secondcow = ncl[en] - ncl[sn];
-		vector<int> gpw;
-		vector<int> gpwvalues;
-		//all the values inside I need to make a vector for.
-		for(int i = ncl[sn] + 1; i <ncl[en]; i++) { 
-			if(identifier[i] == 1) {gpw.push_back(i); gpwvalues.push_back(grassypatches[i]);}
-		}
+        long long max_window = 0;
+        long long current_window = 0;
+        int L = start_idx;
+        
+        // R을 늘려가며 윈도우를 확장
+        for (int R = start_idx; R < g_idx; R++) {
+            current_window += grass[R].t;
+            
+            // 윈도우의 길이가 (B - A) / 2 '이상'이 되면 성립하지 않으므로 L을 당겨줌
+            // 소수점 오차를 막기 위해 양변에 2를 곱해서 정수 비교: (거리) * 2 >= (B - A)
+            while ((grass[R].p - grass[L].p) * 2 >= (B - A)) {
+                current_window -= grass[L].t;
+                L++;
+            }
+            max_window = max(max_window, current_window);
+        }
 
-		cout << firstcow << ' ' << secondcow << endl;
-		for(int i =0 ; i < gpw.size(); i++){
-			cout << gpw[i] << ' ' << gpwvalues[i] << ' ';
-		}
-		cout << "\n\n";
+        // 1마리 투자했을 때 이득
+        values.push_back(max_window);
+        // 2마리째 투자했을 때 '추가로' 얻는 이득
+        values.push_back(total_sum - max_window); 
+    }
 
+    // 3. 노지의 마지막 소보다 '오른쪽' 구역 (1마리로 전체 독식)
+    long long right_sum = 0;
+    while (g_idx < K) {
+        right_sum += grass[g_idx].t;
+        g_idx++;
+    }
+    values.push_back(right_sum);
 
-		sn++; en++;
-	}
+    // 4. 모든 가능한 이득을 내림차순 정렬하여 가장 큰 N개만 뽑아먹기
+    sort(values.begin(), values.end(), greater<long long>());
 
+    long long ans = 0;
+    int take = min((int)values.size(), N); // 만약 N이 values.size()보다 클 수도 있으므로 안전장치
+    for (int i = 0; i < take; i++) {
+        ans += values[i];
+    }
+
+    cout << ans << "\n";
+
+    return 0;
 }
